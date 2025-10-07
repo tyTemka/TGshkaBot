@@ -8,10 +8,10 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 public class TeledramBot extends TelegramLongPollingBot {
 
-    private final String botToken;
+    private final String botToken System.getenv("TELEGRAM_BOT_TOKEN");
 
-    public TeledramBot(String botToken) {
-        this.botToken = botToken;
+    public TeledramBot() {
+
     }
 
     @Override
@@ -59,4 +59,5 @@ public class TeledramBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
+
 }
