@@ -8,11 +8,12 @@ public class Main {
     public static void main(String[] args) {
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-            telegramBotsApi.registerBot(new TeledramBot(""));
+            telegramBotsApi.registerBot(new TeledramBot());
             System.out.println("Бот запущен!");
         } catch (TelegramApiException e) {
             System.err.println("Ошибка при запуске бота: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 }
