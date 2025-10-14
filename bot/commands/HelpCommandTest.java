@@ -27,7 +27,7 @@ public class HelpCommandTest {
 
     private HelpCommand helpCommand;
 
-    @BeforEach
+    @BeforeEach
     void setUp(){
         Commands helpCmd = mock(Commands.class);
         when(helpCmd.getCommandName()).thenReturn("help");
@@ -42,7 +42,7 @@ public class HelpCommandTest {
         Commands authorsCmd = mock(Commands.class);
         when(authorsCmd.getCommandName()).thenReturn("authors");
         when(authorsCmd.getDescription()).thenReturn("Информация об авторах");
-        when(aboutCmd.getUsage()).thenReturn("/authors");
+        when(authorsCmd.getUsage()).thenReturn("/authors");
 
         Map<String, Commands> registry = Map.of(
                 "help", helpCmd,
@@ -148,7 +148,7 @@ public class HelpCommandTest {
     }
 
     @Test
-    void shouldRetFull_ListCmd_withUnknownCmd() throws TelegramApiException{
+    void shouldRetFull_ListCmd_withEmptyStringArg() throws TelegramApiException{
         long chatId = 12345L;
         //Given
         when(message.getChatId()).thenReturn(String.valueOf(chatId));
