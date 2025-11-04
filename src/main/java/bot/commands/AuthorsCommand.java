@@ -1,10 +1,9 @@
 package bot.commands;
 
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.bots.AbsSender;
+import bot.TelegramBot;
 
-public class AuthorsCommand implements Commands {
+public class AuthorsCommand implements Command {
     @Override
     public String getCommandName() {
         return "authors";
@@ -21,14 +20,7 @@ public class AuthorsCommand implements Commands {
     }
 
     @Override
-    public void execute(AbsSender sender, Message message, String[] args) {
-        SendMessage msg = new SendMessage();
-        msg.setChatId(message.getChatId());
-        msg.setText("Авторы:Биба Екимов и Боба Василенко");
-        try {
-            sender.execute(msg);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void execute(TelegramBot bot, Message message, String[] args) {
+    	bot.sendMessage(message.getChatId(), "Авторы: Дмитрий Екимов и Артём Василенко");
     }
 }

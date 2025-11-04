@@ -1,14 +1,14 @@
 package bot.commands;
 
 import java.util.Map;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.bots.AbsSender;
 
-public class HelpCommand implements Commands {
-    private final Map<String, Commands> commandRegistry;
+import bot.TelegramBot;
 
-    public HelpCommand(Map<String, Commands> commandRegistry) {
+public class HelpCommand implements Command {
+    private final Map<String, Command> commandRegistry;
+
+    public HelpCommand(Map<String, Command> commandRegistry) {
         this.commandRegistry = commandRegistry;
     }
 
@@ -28,12 +28,12 @@ public class HelpCommand implements Commands {
     }
 
     @Override
-    public void execute(AbsSender sender, Message message, String[] args) {
+    public void execute(TelegramBot bot, Message message, String[] args) {
         StringBuilder response = new StringBuilder();
 
         if (args.length > 0 && !args[0].isEmpty()) {
             // Запрос помощи по конкретной команде
-            Commands cmd = commandRegistry.get(args[0]);
+            Command cmd = commandRegistry.get(args[0]);
             if (cmd != null) {
                 response.append("Команда: /").append(cmd.getCommandName()).append("\n")
                         .append("Описание: ").append(cmd.getDescription()).append("\n")
@@ -44,19 +44,11 @@ public class HelpCommand implements Commands {
         } else {
             // Общий список команд
             response.append("Доступные команды:\n");
-            for (Commands cmd : commandRegistry.values()) {
+            for (Command cmd : commandRegistry.values()) {
                 response.append("/").append(cmd.getCommandName())
                         .append(" — ").append(cmd.getDescription()).append("\n");
             }
         }
-
-        SendMessage msg = new SendMessage();
-        msg.setChatId(message.getChatId());
-        msg.setText(response.toString());
-        try {
-            sender.execute(msg);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        bot.sendMessage(message.getChatId(), response.toString());
     }
 }

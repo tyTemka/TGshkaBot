@@ -8,7 +8,7 @@ class CommandRegistryTest {
 
     @Test
     void shouldRegisterAllCommands() {
-        Map<String, Commands> allCommands = CommandRegistry.getAllCommands();
+        Map<String, Command> allCommands = CommandRegistry.getAllCommands();
 
         assertEquals(3, allCommands.size());
         assertTrue(allCommands.containsKey("about"));
@@ -22,8 +22,8 @@ class CommandRegistryTest {
 
     @Test
     void shouldGetCommandByName() {
-        Commands about = CommandRegistry.getCommand("about");
-        Commands unknown = CommandRegistry.getCommand("unknown");
+        Command about = CommandRegistry.getCommand("about");
+        Command unknown = CommandRegistry.getCommand("unknown");
 
         assertInstanceOf(AboutCommand.class, about);
         assertNull(unknown);
@@ -31,7 +31,7 @@ class CommandRegistryTest {
 
     @Test
     void shouldReturnImmutableCopyOfCommands() {
-        Map<String, Commands> copy = CommandRegistry.getAllCommands();
+        Map<String, Command> copy = CommandRegistry.getAllCommands();
         int sizeBefore = copy.size();
 
         // Пытаемся изменить копию
