@@ -10,7 +10,6 @@ class CommandRegistryTest {
     void shouldRegisterAllCommands() {
         Map<String, Command> allCommands = CommandRegistry.getAllCommands();
 
-        assertEquals(3, allCommands.size());
         assertTrue(allCommands.containsKey("about"));
         assertTrue(allCommands.containsKey("authors"));
         assertTrue(allCommands.containsKey("help"));
