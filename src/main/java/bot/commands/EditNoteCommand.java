@@ -73,7 +73,7 @@ public class EditNoteCommand implements Command{
 	                try {
 	                	noteService.removeNoteFromDB(chatId, cleanName);
 	                    noteService.addNoteToDB(chatId, cleanName, noteText.trim());
-	                    bot.sendMessage(chatId, "Заметка \"" + cleanName + "\" добавлена!");
+	                    bot.sendMessage(chatId, "Заметка \"" + cleanName + "\" успешно обновлена!");
 	                } catch (Exception e) {
 	                    //e.printStackTrace(); // Не обрабатываем ошибку добавления
 	                    bot.sendMessage(chatId, "Ошибка добавления заметки. Попробуйте позже.");

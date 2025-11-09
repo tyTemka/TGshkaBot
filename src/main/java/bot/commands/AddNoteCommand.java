@@ -53,6 +53,7 @@ public class AddNoteCommand implements Command{
                     noteService.addNoteToDB(chatId, cleanName, noteText.trim());
                     bot.sendMessage(chatId, "Заметка \"" + cleanName + "\" добавлена!");
                 } catch (Exception e) {
+                	e.printStackTrace();
                     bot.sendMessage(chatId, "Ошибка добавления заметки. Попробуйте позже.");
                 }
             });
