@@ -1,50 +1,67 @@
 package bot.commands;
 
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor; // ← для объявления поля
+import org.mockito.Captor; // ← для аннотации @Captor
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.objects.Message;
-
-import bot.TelegramBot;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*; // Чтобы не писать Mokito.when
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorsCommandTest {
+	@Mock
+	private AbsSender sender;
+	
+	@Mock
+	private Message message;
+	
+    @Captor
+    private ArgumentCaptor<SendMessage> sendMessageCaptor; // Ловим аргументы из SendMessage
 
-    @Mock
-    private TelegramBot bot;
-
-    @Mock
-    private Message message;
-
-    private final AuthorsCommand command = new AuthorsCommand();
-
-    @Test
-    void shouldSendAboutMessageToCorrectChat() {
-        // Given
-        Long chatId = 123456789L;
+    private final AuthorsCommand command = new AuthorsCommand();	
+	
+	@Test											// для verify
+	void shouldSendAboutMessageToCorrectChat() throws TelegramApiException {
+		// Given
+		Long chatId = 123456789L;
         when(message.getChatId()).thenReturn(chatId);
+        // When
+        command.execute(sender, message, new String[]{});
+        // Then
+        verify(sender).execute(sendMessageCaptor.capture());
+
+        SendMessage sendMessage = sendMessageCaptor.getValue();
+        assertThat(sendMessage.getChatId()).isEqualTo(chatId.toString());
+        assertThat(sendMessage.getText()).isEqualTo("Это бот для заметок. Версия 0.1.");
+	}
+    @Test
+    void shouldHandleEmptyArgs() throws TelegramApiException {
+        // Given
+        when(message.getChatId()).thenReturn(987654321L);
 
         // When
-        command.execute(bot, message, new String[]{});
+        command.execute(sender, message, new String[]{}); // пустой массив
 
         // Then
-        verify(bot).sendMessage(eq(chatId), eq("Авторы: Дмитрий Екимов и Артём Василенко"));
+        verify(sender).execute(any(SendMessage.class));
     }
 
     @Test
-    void shouldHandleEmptyArgs() {
-        when(message.getChatId()).thenReturn(987654321L);
-        command.execute(bot, message, new String[]{});
-        verify(bot).sendMessage(anyLong(), anyString());
-    }
-
-    @Test
-    void shouldHandleNonEmptyArgs() {
+    void shouldHandleNonEmptyArgs() throws TelegramApiException {
+        // Given
         when(message.getChatId()).thenReturn(111222333L);
-        command.execute(bot, message, new String[]{"лишний", "аргумент"});
-        verify(bot).sendMessage(anyLong(), anyString());
+
+        // When
+        command.execute(sender, message, new String[]{"лишний", "аргумент"});
+
+        // Then
+        verify(sender).execute(any(SendMessage.class));
     }
 }
+

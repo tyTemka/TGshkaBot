@@ -7,6 +7,8 @@ import bot.commands.InputHandler;
 import bot.commands.CommandRegistry;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 public class TelegramBot extends TelegramLongPollingBot {
@@ -78,6 +80,17 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(msg);
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void sendReminder(Long chatId, String text) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId.toString());
+        message.setText(text);
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
