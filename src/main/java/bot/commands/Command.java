@@ -4,7 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import bot.TelegramBot;
 
-public interface Command {
+public interface Command { //прописываем контракт для команд
  String getCommandName();       // например: "help"
  String getDescription();       // краткое описание
  String getUsage();             // как использовать (например: "/help <command>")

@@ -21,6 +21,6 @@ public class AuthorsCommand implements Command {
 
     @Override
     public void execute(TelegramBot bot, Message message, String[] args) {
-    	bot.sendMessage(message.getChatId(), "Авторы: Дмитрий Екимов и Артём Василенко");
+    	bot.sendMessage(message.getChatId(), "👤Автор: Артём Василенко \n📚Группа: КБ - 202 \n🌐 Ссылка на репозиторий: https://github.com/tyTemka/TGshkaBot");
     }
 }
