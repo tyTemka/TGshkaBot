@@ -1,10 +1,14 @@
 package bot;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import bot.commands.Command;
 import bot.commands.InputHandler;
 import bot.commands.CommandRegistry;
+import bot.dataBaseService.NoteService;
+import bot.models.SharedNoteData;
+import bot.utilits.SharedNoteRegistry;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -21,14 +25,14 @@ import java.util.List;
 public class TelegramBot extends TelegramLongPollingBot { //оправшиваем сервер на предмет вхождения сообщений 
 
     private final String botToken = System.getenv("TELEGRAM_BOT_TOKEN");
-    
+    private final NoteService noteService = new NoteService();
     public TelegramBot() {
     	
     }
 
     @Override
     public String getBotUsername() {
-        return "Unterrichtung_bot";
+        return "OOPOOP_tg_bot";
     }
 
     @Override
@@ -60,6 +64,14 @@ public class TelegramBot extends TelegramLongPollingBot { //оправшивае
             InputHandler handler = pendingInputHandlers.remove(chatId);
             handler.handle(text);
             return;
+        }
+
+        if (text.startsWith("/start ")) {
+            String payload = text.substring(7).trim(); // "/start " + айди заметки
+            if (payload.startsWith("share_")) {
+                handleShareLink(payload, message.getFrom().getId(), chatId);
+                return;
+            }
         }
 
         //  Определяем логическое имя команды
@@ -154,6 +166,9 @@ public class TelegramBot extends TelegramLongPollingBot { //оправшивае
     
  // ОСНОВНОЙ метод — с клавиатурой по умолчанию
     public void sendMessage(Long chatId, String text) {
+        if (text == null) {
+            text = "⚠️ Текст заметки отсутствует.";
+        }
         sendMessageWithKeyboard(chatId, text, true); // true = показывать клавиатуру
     }
 
@@ -167,6 +182,10 @@ public class TelegramBot extends TelegramLongPollingBot { //оправшивае
         SendMessage msg = new SendMessage();
         msg.setChatId(chatId);
         msg.setText(text);
+
+        if (text == null) {
+            text = "⚠️ Текст заметки отсутствует.";
+        }
 
         if (withKeyboard) {
             msg.setReplyMarkup(createCommandKeyboard());
@@ -182,5 +201,45 @@ public class TelegramBot extends TelegramLongPollingBot { //оправшивае
             e.printStackTrace();
         }
     }
-    
+
+    private final SharedNoteRegistry sharedNoteRegistry = new SharedNoteRegistry();
+
+    public SharedNoteRegistry getSharedNoteRegistry() { // для генерации и хранения ссылок
+        return sharedNoteRegistry;
+    }
+
+    public NoteService getNoteService() { // считка/запись заметок в БД
+        return noteService;
+    }
+
+    private void handleShareLink(String payload, Long userId, Long chatId) {
+        String noteId = payload.substring(6); // отрезаем "share_"
+
+        //удаляем из реестра тк ссылка одноразовая
+        SharedNoteData data = sharedNoteRegistry.consume(noteId);
+        if (data == null) {
+            sendMessage(chatId, "❌ Ссылка недействительна или уже использована.");
+            return;
+        }
+
+        try {
+            // читаем заметку у владельца
+            String text = noteService.getNote(data.ownerId, data.noteName);
+            if (text == null) {
+                sendMessage(chatId, "⚠️ Заметка удалена владельцем.");
+                return;
+            }
+
+            String newNoteName = "🔖 " + data.noteName;
+            noteService.addNoteToDB(userId, newNoteName, text, null);
+
+            sendMessage(chatId,
+                    "✅ Получена заметка «" + data.noteName + "»\n" +
+                            "Теперь она в вашем списке — можете редактировать как обычную.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendMessage(chatId, "❌ Не удалось получить заметку.");
+        }
+    }
 }
